@@ -15,7 +15,10 @@ export const queryPineconeVectorStoreAndQueryLLM = async (
   // 2. Retrieve the Pinecone index
   const index = client.Index(indexName);
   // 3. Create query embedding
-  const queryEmbedding = await new OpenAIEmbeddings().embedQuery(question)
+  //const queryEmbedding = await new OpenAIEmbeddings().embedQuery(question)
+  const queryEmbedding = await new OpenAIEmbeddings({
+    openAIApiKey: process.env.OPENAI_API_KEY
+  }).embedQuery(question);
   // 4. Query Pinecone index and return top 10 matches
   let queryResponse = await index.query({
     queryRequest: {
@@ -90,7 +93,7 @@ export const updatePinecone = async (client, indexName, docs) => {
   console.log(`Pinecone index retrieved: ${indexName}`);
   // 3. Process each document in the docs array
   for (const doc of docs) {
-    console.log(`Processing document: ${doc.metadata.source}`);
+    console.log(`\nProcessing document: ${doc.metadata.source}`);
     const txtPath = doc.metadata.source;
     const text = doc.pageContent;
     // 4. Create RecursiveCharacterTextSplitter instance
@@ -105,7 +108,9 @@ export const updatePinecone = async (client, indexName, docs) => {
       `Calling OpenAI's Embedding endpoint documents with ${chunks.length} text chunks ...`
     );
     // 6. Create OpenAI embeddings for documents
-    const embeddingsArrays = await new OpenAIEmbeddings().embedDocuments(
+    const embeddingsArrays = await new OpenAIEmbeddings({
+      openAIApiKey: process.env.OPENAI_API_KEY
+    }).embedDocuments(
       chunks.map((chunk) => chunk.pageContent.replace(/\n/g, " "))
     );
     console.log('Finished embedding documents');

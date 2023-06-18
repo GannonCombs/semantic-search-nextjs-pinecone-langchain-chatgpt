@@ -6,6 +6,7 @@ import {
 import { indexName } from '../../../config'
 
 export async function POST(req: NextRequest) {
+//export async function POST(req, res) {
   const body = await req.json()
   const client = new PineconeClient()
   await client.init({
@@ -15,7 +16,6 @@ export async function POST(req: NextRequest) {
 
   const text = await queryPineconeVectorStoreAndQueryLLM(client, indexName, body)
 
-  return NextResponse.json({
-    data: text
-  })
+  return NextResponse.json({ data: text });
+
 }
